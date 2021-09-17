@@ -1,0 +1,5 @@
+default:
+    meta_data_file: 'meta_file.xlsx'
+mike:
+    inherits: default
+    meta_data_dir: 'data'

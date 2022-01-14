@@ -41,3 +41,22 @@ do_mgen <- function(f, sheet) {
   return(m.gen)
 }
 
+# z = −0.862 + √[0.743 − 2.404×log(P)]
+p <- .05
+
+
+ci_from_ratio_and_p <- function(est, p) {
+  # Using methods from here: https://doi.org/10.1136/bmj.d2090
+  z <- -0.862 + sqrt(0.743 - 2.404*log(p)) #qnorm(p)
+  print(paste('z:',z))
+  est <- log(est) # put estimate on the log scale
+  print(paste('est:',est))
+  se <- abs(est / z)
+  print(paste('se:',se))
+  lower <- exp(est - (1.96*se)) # taking anti-log
+  upper <- exp(est + (1.96*se))
+  # lower <- est - (1.96*se) # taking anti-log
+  # upper <- est + (1.96*se)
+  print(lower)
+  print(upper)
+}

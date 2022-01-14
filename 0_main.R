@@ -8,6 +8,7 @@ library(here)
 library(config)
 library(tidyverse)
 library(tidyselect)
+library(effectsize)
 
 debuggingState(on = FALSE)
 Sys.setenv(R_CONFIG_ACTIVE = "mike")

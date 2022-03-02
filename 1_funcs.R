@@ -60,3 +60,29 @@ ci_from_ratio_and_p <- function(est, p) {
   print(lower)
   print(upper)
 }
+
+d_from_means_sds <- function(m1,m2,sd1,sd2,n1,n2){
+  sd_pooled <- sqrt(
+    (sd1^2 + sd2^2)/2
+  )
+  d <- (m2 - m1)/sd_pooled
+  return(d)
+}
+
+rr_from_hr <- function(hr,r){
+  # found here:https://stats.stackexchange.com/questions/130237/convert-hazards-ratio-to-odds-ratio
+  # http://doi.org/10.1016/j.socscimed.2017.05.049
+  
+  rr <- (1 - exp(hr*log(1-r))) / r
+  return(rr)
+}
+
+### a little helper function to add Q-test, I^2, and tau^2 estimate info
+### from: https://www.metafor-project.org/doku.php/plots:forest_plot_with_subgroups
+mlabfun <- function(text, res) {
+  list(bquote(paste(.(text),
+                    " (Q = ", .(formatC(res$QE, digits=2, format="f")),
+                    ", df = ", .(res$k - res$p),
+                    ", p ", .(metafor:::.pval(res$QEp, digits=2, showeq=TRUE, sep=" ")), "; ",
+                    I^2, " = ", .(formatC(res$I2, digits=1, format="f")), "%, ",
+                    tau^2, " = ", .(formatC(res$tau2, digits=2, format="f")), ")")))}

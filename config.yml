@@ -1,5 +1,7 @@
 default:
-    meta_data_file: 'meta_file.xlsx'
+    meta_data_file: 'meta_es_file.xlsx'
+    old_meta_data_file: 'meta_file.xlsx'
 mike:
     inherits: default
     meta_data_dir: 'data'
+    jaxon_data_dir: '/Users/mrosen44/Johns Hopkins/Jaxon Wu - Surgical Team Composition/Abstraction Form (excel)'

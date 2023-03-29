@@ -1,17 +1,20 @@
 library(metafor)
 
 df <- readxl::read_excel(
-  file.path(here(),config$meta_data_dir, config$meta_data_file),
+  file.path(config$jaxon_data_dir, config$meta_data_file),#here(),config$meta_data_dir, config$meta_data_file),
   sheet = 'beta_metafor'
 )
 
 df <- df %>%
-  filter(effect_num != 21 & effect_num != 26 & effect_num != 38) # This is a crazy outlier for sampling variance.
-
+  filter(effect_num != 21 & effect_num != 26 & effect_num != 38) %>%# This is a crazy outlier for sampling variance.
+  filter(
+    effect_num != 50,  # Flynn paper w/ unstandardized coefs, and not enough info to convert
+    author != 'Kang2015' # this is scrub NTS scores
+         )
 ### Standardize unstandarzied coefficients and CIs
 df$beta <- replmiss(df$beta, with(df, (df$unstandardized_coefs*(df$SD_x/df$SD_y))))
-df$ci.lb <- replmiss(df$ci.lb, with(df, (df$ci.lb*(df$SD_x/df$SD_y))))
-df$ci.ub <- replmiss(df$ci.ub, with(df, (df$ci.ub*(df$SD_x/df$SD_y))))
+df$ci.lb <- replmiss(df$ci.lb, with(df, (df$us.ci.lb*(df$SD_x/df$SD_y))))
+df$ci.ub <- replmiss(df$ci.ub, with(df, (df$us.ci.ub*(df$SD_x/df$SD_y))))
 
 ### Just using beta's as the effect size
 df$yi <- df$beta
@@ -32,7 +35,7 @@ df$ti <- NULL
 
 res2 <- rma.mv(yi = yi, V = vi, data = df,
                slab = author,
-               mods = ~ familiarity_level + outcome,
+               # mods = ~ familiarity_level + outcome,
                random = ~ 1 | author / effect_num,
                test = 't',
                method = 'REML')
@@ -40,6 +43,9 @@ summary(res2)
 predict(res2, 
         transf = exp, 
         digits = 2)
+funnel(res2)
+forest(res2)
+
 forest(res2,
        main = '(Preliminary)\nEffects of team familiarity on utilization outcomes',
        header = TRUE,
@@ -49,6 +55,7 @@ forest(res2,
        addfit = TRUE,
        addpred = TRUE)
 # radial(res2)
-funnel(res2)
+
 # plot(gosh(res2))
 # funnel(trimfill(res2))
+broom::tidy(res2, include_studies = TRUE, conf.int = TRUE)
